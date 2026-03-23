@@ -1,9 +1,12 @@
 package com.emt.library.web.controller;
 
+import com.emt.library.model.domain.Book;
 import com.emt.library.model.dto.CreateBookDto;
 import com.emt.library.model.dto.DisplayBookDto;
+import com.emt.library.model.projection.BookProjection;
 import com.emt.library.service.application.BookApplicationService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +29,7 @@ public class BookController {
                 .orElseGet(()->ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<DisplayBookDto>> findAll(){
         return ResponseEntity.ok(bookApplicationService.findAll());
     }
@@ -61,5 +64,35 @@ public class BookController {
                 .rent(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Book>> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(bookApplicationService.findAll(page, size));
+    }
+
+    @GetMapping("/sorted")
+    public ResponseEntity<List<BookProjection>> findAllSortedByNameAndCreatedAt(){
+        return ResponseEntity.ok(bookApplicationService.findAllOrderByTitleAndCreatedAt());
+    }
+
+    @GetMapping("/author/{id}")
+    public ResponseEntity<List<DisplayBookDto>> findAllByAuthorId(@PathVariable Long id){
+        return ResponseEntity.ok(bookApplicationService.findAllByAuthorId(id));
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<List<DisplayBookDto>> findAllByCategory(@RequestParam String category){
+        return ResponseEntity.ok(bookApplicationService.findAllByCategory(category));
+    }
+
+    @GetMapping("/state")
+    public ResponseEntity<List<DisplayBookDto>> findAllByState(@RequestParam String state){
+        return ResponseEntity.ok(bookApplicationService.findAllByState(state));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<DisplayBookDto>> findAllByAvailable(){
+        return ResponseEntity.ok(bookApplicationService.findAllByAvailableCopiesGreaterThan(0));
     }
 }

@@ -12,7 +12,7 @@ values (now(), now(), 'Stephen', 'King', 1),
        (now(), now(), 'Fyodor', 'Dostoevsky', 4),
        (now(), now(), 'Gabriel', 'Garcia Marquez', 5);
 
-insert into books (created_at, updated_at, name, author_id, category, state, available_copies)
+insert into books (created_at, updated_at, title, author_id, category, state, available_copies)
 values (now(), now(), 'The Shining', 1, 'THRILLER', 'GOOD', 5),
        (now(), now(), 'It', 1, 'THRILLER', 'GOOD', 3),
        (now(), now(), '1984', 2, 'CLASSICS', 'GOOD', 8),

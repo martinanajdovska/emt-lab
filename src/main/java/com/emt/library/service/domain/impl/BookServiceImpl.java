@@ -1,10 +1,15 @@
 package com.emt.library.service.domain.impl;
 
 import com.emt.library.model.domain.Book;
+import com.emt.library.model.domain.BookCategory;
 import com.emt.library.model.domain.BookState;
 import com.emt.library.model.exception.NoAvailableCopiesException;
+import com.emt.library.model.projection.BookProjection;
 import com.emt.library.repository.BookRepository;
 import com.emt.library.service.domain.BookService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +43,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository
                 .findById(id)
                 .map((existing) -> {
-                    existing.setName(book.getName());
+                    existing.setTitle(book.getTitle());
                     existing.setAuthor(book.getAuthor());
                     existing.setCategory(book.getCategory());
                     existing.setAvailableCopies(book.getAvailableCopies());
@@ -66,5 +71,36 @@ public class BookServiceImpl implements BookService {
                     book.setAvailableCopies(book.getAvailableCopies() - 1);
                     return bookRepository.save(book);
                 });
+    }
+
+    @Override
+    public Page<Book> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bookRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Book> findAllByCategory(BookCategory category) {
+        return bookRepository.findAllByCategory(category);
+    }
+
+    @Override
+    public List<Book> findAllByAuthorId(Long authorId) {
+        return bookRepository.findAllByAuthorId(authorId);
+    }
+
+    @Override
+    public List<Book> findAllByAvailableCopiesGreaterThan(Integer availableCopies) {
+        return bookRepository.findAllByAvailableCopiesGreaterThan(availableCopies);
+    }
+
+    @Override
+    public List<BookProjection> findAllOrderByTitleAndCreatedAt() {
+        return bookRepository.findAllOrderByTitleDescCreatedAtDesc();
+    }
+
+    @Override
+    public List<Book> findAllByState(BookState bookState) {
+        return bookRepository.findAllByState(bookState);
     }
 }

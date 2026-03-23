@@ -6,7 +6,7 @@ import java.util.List;
 
 public record DisplayBookDto(
         Long id,
-        String name,
+        String title,
         String category,
         Long authorId,
         String state,
@@ -15,7 +15,7 @@ public record DisplayBookDto(
     public static DisplayBookDto from(Book book) {
         return new DisplayBookDto(
                 book.getId(),
-                book.getName(),
+                book.getTitle(),
                 book.getCategory().name(),
                 book.getAuthor().getId(),
                 book.getState().name(),

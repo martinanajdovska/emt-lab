@@ -18,7 +18,7 @@ create table books (
     id bigserial primary key,
     created_at timestamp not null,
     updated_at timestamp not null,
-    name varchar(255) not null,
+    title varchar(255) not null,
     author_id bigint not null,
     category varchar(255) not null,
     state varchar(255) not null,

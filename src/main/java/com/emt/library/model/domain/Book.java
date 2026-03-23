@@ -10,9 +10,23 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "books")
+@NamedEntityGraph(
+        name = "book-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode(value = "author", subgraph = "book-author-subgraph"),
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "book-author-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("country")
+                        }
+                ),
+        }
+)
 public class Book extends BaseAuditableEntity{
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -30,7 +44,7 @@ public class Book extends BaseAuditableEntity{
     private Integer availableCopies;
 
     public Book(String name, BookCategory category, Author author, BookState state, Integer availableCopies) {
-        this.name = name;
+        this.title = name;
         this.category = category;
         this.author = author;
         this.state = state;

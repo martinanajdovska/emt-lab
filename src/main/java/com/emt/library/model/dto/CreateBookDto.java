@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Positive;
 
 public record CreateBookDto (
         @NotBlank
-        String name,
+        String title,
         @NotBlank
         String category,
         @NotNull
@@ -21,6 +21,6 @@ public record CreateBookDto (
         Integer availableCopies
         ) {
     public Book toBook(Author author){
-        return new Book(name, BookCategory.valueOf(category), author, BookState.valueOf(state), availableCopies);
+        return new Book(title, BookCategory.valueOf(category), author, BookState.valueOf(state), availableCopies);
     }
 }
