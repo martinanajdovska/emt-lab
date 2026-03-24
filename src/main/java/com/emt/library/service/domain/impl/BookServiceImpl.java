@@ -1,5 +1,7 @@
 package com.emt.library.service.domain.impl;
 
+import com.emt.library.events.BookRentedEvent;
+import com.emt.library.events.BookUnavailableEvent;
 import com.emt.library.model.domain.Book;
 import com.emt.library.model.domain.BookCategory;
 import com.emt.library.model.domain.BookState;
@@ -7,6 +9,8 @@ import com.emt.library.model.exception.NoAvailableCopiesException;
 import com.emt.library.model.projection.BookProjection;
 import com.emt.library.repository.BookRepository;
 import com.emt.library.service.domain.BookService;
+import jakarta.transaction.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +22,11 @@ import java.util.Optional;
 @Service
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.bookRepository = bookRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -61,16 +67,24 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public Optional<Book> rent(Long id) {
-        return bookRepository
+        Optional<Book> book = bookRepository
                 .findById(id)
-                .map(book -> {
-                    if (book.getAvailableCopies() <= 0) {
+                .map(b -> {
+                    if (b.getAvailableCopies() <= 0) {
                         throw new NoAvailableCopiesException(id);
                     }
-                    book.setAvailableCopies(book.getAvailableCopies() - 1);
-                    return bookRepository.save(book);
+                    b.setAvailableCopies(b.getAvailableCopies() - 1);
+                    return bookRepository.save(b);
                 });
+        book.ifPresent(b -> {
+            applicationEventPublisher.publishEvent(new BookRentedEvent(b));
+            if (b.getAvailableCopies() == 0) {
+                applicationEventPublisher.publishEvent(new BookUnavailableEvent(b));
+            }
+        });
+        return book;
     }
 
     @Override
